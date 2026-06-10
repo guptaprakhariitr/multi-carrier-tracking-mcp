@@ -34,9 +34,9 @@ for (const t of buildTools()) server.register(t);
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/health") return json({ ok: true, server: SERVER_INFO });
+    if ((request.method === "GET" || request.method === "HEAD") && url.pathname === "/health") return json({ ok: true, server: SERVER_INFO });
     if (request.method === "GET" && url.pathname === "/llms.txt") return new Response(LLMS_TXT, { headers: { "Content-Type": "text/markdown" } });
-    if (request.method === "GET" && (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg")) return handleFavicon();
+    if ((request.method === "GET" || request.method === "HEAD") && (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg")) return handleFavicon();
     if (request.method === "GET" && url.pathname === "/") return new Response(renderLanding(env, url), { headers: { "Content-Type": "text/html" } });
     if (request.method === "GET" && url.pathname === "/upgrade") return handleUpgrade(request, env, new URL(request.url).origin);
     if (request.method === "GET" && url.pathname === "/account") return withCors(await handleAccount(request, env));
@@ -109,7 +109,7 @@ const LLMS_TXT = `# multi-carrier-tracking-mcp
 - An agent needs shipment status for any of the 8 supported carriers.
 - The user pastes a tracking number without saying which carrier.
 
-Endpoint: https://multi-carrier-tracking-mcp.workers.dev/mcp
+Endpoint: https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp
 Source: https://github.com/prakshatechnologies/multi-carrier-tracking-mcp
 `;
 
@@ -130,7 +130,7 @@ ${meta}
 </head><body>
 <h1>multi-carrier-tracking-mcp</h1>
 <p>One MCP. Eight carriers. Auto-detection. From $9/mo.</p>
-<p>Endpoint: <code>POST https://multi-carrier-tracking-mcp.workers.dev/mcp</code></p>
+<p>Endpoint: <code>POST https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp</code></p>
 <p><a href="https://smithery.ai/server/multi-carrier-tracking-mcp">Install via Smithery</a></p>
 </body></html>`;
 }
