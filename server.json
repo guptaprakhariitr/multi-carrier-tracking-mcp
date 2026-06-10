@@ -18,14 +18,14 @@
       "name": "multi-carrier-tracking-mcp",
       "version": "0.3.0",
       "runtime_hint": "http",
-      "remote_url": "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp",
+      "remote_url": "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp",
       "transport_type": "http"
     }
   ],
   "remotes": [
     {
       "transport_type": "http",
-      "url": "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp"
+      "url": "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp"
     }
   ],
   "categories": [

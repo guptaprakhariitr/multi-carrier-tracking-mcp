@@ -15,16 +15,16 @@ binding = "USAGE"
 id = "80bd5c2a5510491f8f2753fe50cf5676"
 
 [vars]
-UPGRADE_URL = "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/upgrade"
+UPGRADE_URL = "https://multi-carrier-tracking-mcp.atlasword.workers.dev/upgrade"
 PRODUCT_NAME = "multi-carrier-tracking-mcp"
 PRODUCT_TAGLINE = "MCP server for multi-carrier package tracking. Auto-detects USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex."
-PRODUCT_URL = "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev"
+PRODUCT_URL = "https://multi-carrier-tracking-mcp.atlasword.workers.dev"
 DODO_PRODUCT_ID_SOLO = "pdt_0NgkUVMkaqnP047UejPx7"
 DODO_PRODUCT_ID_TEAM = "pdt_0NgkUVOK3tWjrI0ijPXoz"
 DODO_PRODUCT_ID_PRO  = "pdt_0NgkUVQbJYPdl4IbUvhsd"
 FROM_EMAIL = "prakshatechnologies@gmail.com"
 DODO_BASE = "https://live.dodopayments.com"
-CUSTOMER_PORTAL_RETURN_URL = "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/account"
+CUSTOMER_PORTAL_RETURN_URL = "https://multi-carrier-tracking-mcp.atlasword.workers.dev/account"
 
 # Secrets via `wrangler secret put`:
 #   USPS_USER_ID            (free USPS Web Tools key)

@@ -25,7 +25,7 @@ Auto-crawls GitHub by repo topic `mcp-server`. Already tagged. Indexes within 24
 - **Display name:** `Package Tracking (8 carriers)`
 - **Description:** `Auto-detects USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex from a tracking number.`
 - **GitHub URL:** `https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp`
-- **Endpoint URL:** `https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp`
+- **Endpoint URL:** `https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp`
 - **Tags:** tracking, usps, ups, fedex, dhl, india-post, delhivery, shipping
 - **License:** MIT
 - **Transport:** HTTP (remote)
@@ -50,7 +50,7 @@ Auto-crawls GitHub by repo topic `mcp-server`. Already tagged. Indexes within 24
 ### Twitter / X thread template
 > Just shipped multi-carrier-tracking-mcp — Model Context Protocol server: auto-detects usps, ups, fedex, dhl, india post, delhivery, bluedart, aramex from a tracking number.
 >
-> Endpoint: https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp
+> Endpoint: https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp
 > GitHub: https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp
 >
 > Free tier available. Paid from $9/mo.

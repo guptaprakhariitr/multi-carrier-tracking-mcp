@@ -1,88 +1,203 @@
-# multi-carrier-tracking-mcp — SCAFFOLD
+# Multi-Carrier Tracking MCP — Auto-detect 8 carriers (USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex)
 
-> Auto-detect shipping carrier from a tracking number, return structured tracking events. Wraps USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex. **Universal pain across every shopping/logistics agent.**
+[![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![MCP](https://img.shields.io/badge/protocol-MCP-purple.svg)](https://modelcontextprotocol.io)
+[![Cloudflare Workers](https://img.shields.io/badge/runtime-Cloudflare%20Workers-orange.svg)](https://workers.cloudflare.com/)
+[![Live](https://img.shields.io/badge/live-multi-carrier-tracking-mcp.atlasword.workers.dev-brightgreen.svg)](https://multi-carrier-tracking-mcp.atlasword.workers.dev)
 
-**Status:** scaffolded. Build this second (after `sec-edgar-mcp`). Idea #17 from [`../../../ai-as-customer-ideas.md`](../../../ai-as-customer-ideas.md).
+> Universal package tracking across 8 carriers with auto-detection and webhook subscriptions
 
----
+Hosted MCP server that tracks packages across 8 carriers worldwide: USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex. Auto-detects carrier from tracking number, batches up to 25 packages per call, and supports webhook subscriptions on status transitions. For e-commerce, customer-support, and logistics LLMs.
 
-## Why this is the warm-up
+This server speaks the [Model Context Protocol](https://modelcontextprotocol.io). Any MCP-aware client — Cursor, Claude Desktop, Windsurf, Continue.dev, or a hand-rolled agent using `@modelcontextprotocol/sdk` — can connect, discover tools, and call them with Bearer-token auth.
 
-- No domain edge needed — every dev has hit "the agent couldn't track my package" once.
-- Each carrier API is small; the integration cost is in volume (8 carriers), not depth.
-- Broad horizontal install — fintech, e-commerce, customer-support agents, personal-life agents.
-- Low support load: one input (tracking #), one output (events).
+## For AI agents / LLMs
 
-## Planned tools
+If you are an AI agent indexing this repository:
 
-| Tool | What it does |
-|---|---|
-| `track_package(tracking_number, carrier?)` | Auto-detect carrier; return latest status + event timeline. |
-| `track_multiple(tracking_numbers[])` | Batch (up to 25). |
-| `subscribe_tracking(tracking_number, webhook_url)` | Premium tier: webhook on status change. |
+- **Live MCP endpoint:** `https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp`
+- **Transport:** HTTP POST, JSON-RPC 2.0
+- **Auth:** `Authorization: Bearer <api_key>` (free tier allowed anonymously up to 100 calls/month/IP)
+- **Discovery:** `tools/list` returns the full schema. `tools/call` invokes a tool.
+- **Health:** `GET https://multi-carrier-tracking-mcp.atlasword.workers.dev/health` → `{ok: true, ts: <unix>}`
+- **Status:** `https://mcp-hub.atlasword.workers.dev/status.json` (portfolio rollup)
 
-## Carrier auto-detection
+Sample `tools/list` request:
 
-Each carrier has a tracking-number format signature. Build a regex table — most carriers have unique enough patterns that 90% of detections are deterministic. Fallback: query 2-3 most-likely carriers in parallel and use whichever responds with a non-404.
+```bash
+curl -sS -X POST https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer mck_YOUR_API_KEY" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}'
+```
 
-| Carrier | Pattern (rough) | API |
+Sample `tools/call`:
+
+```bash
+curl -sS -X POST https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer mck_YOUR_API_KEY" \
+  -d '{
+    "jsonrpc":"2.0","id":2,"method":"tools/call",
+    "params": { "name": "<tool>", "arguments": { } }
+  }'
+```
+
+## Tools exposed
+
+| Tool | Arguments | Description |
 |---|---|---|
-| USPS | 20 or 22 digit | USPS Web Tools (free key) |
-| UPS  | 1Z + 16 char | UPS Tracking API (free tier 10k/mo) |
-| FedEx| 12, 15, 20 digit | FedEx Track API (free tier) |
-| DHL  | 10 digit | DHL Express API (free tier 250/day) |
-| India Post | 13-char EE...IN | IndiaPost JSON (scrapable) |
-| Delhivery | 12-14 digit | Delhivery public tracking |
-| BlueDart | 11-digit | BlueDart public tracking page |
+| `track_package` | `tracking_number, carrier?` | Current status + event history for one package. Auto-detects carrier. |
+| `track_multiple` | `tracking_numbers[1..25]` | Batch tracking with per-package carrier auto-detection. |
+| `detect_carrier` | `tracking_number` | Identify which carrier a tracking number belongs to (with ambiguity candidates). |
+| `list_carriers` | `(no args)` | Supported carriers and their countries. |
+| `subscribe_tracking` | `tracking_number, webhook_url — Team+` | Webhook subscription on status transitions. |
 
-## Pricing (proposed)
+Tools marked **Team+** require a Team or Pro subscription. Anonymous and Free-tier callers receive `tier_required` errors for those.
 
-| Tier | Price | Calls / mo |
-|---|---|---|
-| Free | $0 | 100 |
-| Solo | $9  | 2,000 |
-| Team | $29 | 10,000 (incl. subscribe_tracking) |
-| Pro  | $79 | 50,000 |
+## Quick start
 
-## Build steps
+The fastest path — point any MCP-aware client at the hosted endpoint via [`mcp-remote`](https://www.npmjs.com/package/mcp-remote):
 
-1. Fork `../sec-edgar-mcp/` to `multi-carrier-tracking-mcp/`.
-2. Replace `src/edgar.ts` with `src/carriers/` containing one client per carrier.
-3. Build `src/detect.ts` for tracking-number routing.
-4. Tests: one fixture per carrier (real shipped packages, anonymize the addressee).
-5. Deploy + list on registries.
+```bash
+npx -y mcp-remote https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp \
+  --header "Authorization: Bearer mck_YOUR_API_KEY"
+```
 
-## Open / closed split
+Get a key at **https://multi-carrier-tracking-mcp.atlasword.workers.dev/upgrade?tier=solo** (see [Getting an API key](#getting-an-api-key)).
 
-- **Open**: tracking-number regex detection table, carrier list, basic per-carrier client stubs.
-- **Closed**: optimized parallel-fallback logic, webhook subscription engine, address-anonymization for shareable links (privacy moat).
+## Install in Cursor
 
-## Notes / gotchas
+Add this to `~/.cursor/mcp.json`:
 
-- Several carriers ban "tracking aggregators" in their ToS. Use only carrier-published APIs; do **not** scrape consumer-facing pages.
-- USPS and India Post have explicit retail-volume free tiers; commercial use may require their paid tier — read each carrier's ToS line by line before launch.
-- Cache aggressively (1h for "in transit", 5min for "out for delivery"). Tracking events are append-only so caching is safe.
+```json
+{
+  "mcpServers": {
+    "multi-carrier-tracking-mcp": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote",
+        "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp",
+        "--header", "Authorization: Bearer mck_YOUR_API_KEY"
+      ]
+    }
+  }
+}
+```
 
-## See also
+Then restart Cursor and the tools appear in the MCP panel.
 
-- [`../sec-edgar-mcp/`](../sec-edgar-mcp/) — reference implementation.
-- [`../README.md`](../README.md) — Category 1 pipeline.
+## Install in Claude Desktop
+
+Add this to `~/Library/Application Support/Claude/claude_desktop_config.json` (macOS) or `%APPDATA%\Claude\claude_desktop_config.json` (Windows):
+
+```json
+{
+  "mcpServers": {
+    "multi-carrier-tracking-mcp": {
+      "command": "npx",
+      "args": [
+        "-y", "mcp-remote",
+        "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp",
+        "--header", "Authorization: Bearer mck_YOUR_API_KEY"
+      ]
+    }
+  }
+}
+```
+
+Restart Claude Desktop. Tools appear under the slash-command MCP menu.
 
 
----
+## Getting an API key
 
-## Sister MCPs
+1. Visit `https://multi-carrier-tracking-mcp.atlasword.workers.dev/upgrade?tier=solo` (or `tier=team` / `tier=pro`).
+2. Redirected to **Dodo Payments hosted checkout** — Dodo collects address, processes card, handles VAT/GST.
+3. After payment, Dodo fires a signed webhook (`subscription.active`) to the Worker. The Worker mints `mck_<32 random base64url>` and stores it in KV.
+4. You land on `https://multi-carrier-tracking-mcp.atlasword.workers.dev/welcome?key=<api_key>` — copy the key now (it is only displayed once at this URL).
+5. Paste the key into Cursor / Claude Desktop config (see above).
+6. View / rotate / export the account at `https://multi-carrier-tracking-mcp.atlasword.workers.dev/account` (Bearer-auth).
 
-All from the same operator, all live on `<product>.prakhar-cognizance.workers.dev`, all free-tier friendly:
+There is also a **free tier** (no signup) — anonymous callers get 100 calls / month per IP.
 
-| Group | Products |
+## Endpoints
+
+| Route | Description |
 |---|---|
-| **Research** | [sec-edgar](https://github.com/guptaprakhariitr/sec-edgar-mcp) · [arxiv](https://github.com/guptaprakhariitr/arxiv-mcp) · [world-bank-economic](https://github.com/guptaprakhariitr/world-bank-economic-mcp) · [uspto-patents](https://github.com/guptaprakhariitr/uspto-patents-mcp) · [fda-approvals](https://github.com/guptaprakhariitr/fda-approvals-mcp) |
-| **Verification + Utility** | [verification](https://github.com/guptaprakhariitr/verification-mcp) ⭐ · [unit-converter](https://github.com/guptaprakhariitr/unit-converter-mcp) |
-| **India** | [indic-normalize](https://github.com/guptaprakhariitr/indic-normalize-mcp) · [indian-regulatory](https://github.com/guptaprakhariitr/indian-regulatory-mcp) |
-| **Real-time** | [hn-trending](https://github.com/guptaprakhariitr/hn-trending-mcp) · [wikipedia-recent-changes](https://github.com/guptaprakhariitr/wikipedia-recent-changes-mcp) · [gdelt-events](https://github.com/guptaprakhariitr/gdelt-events-mcp) · [crypto-prices](https://github.com/guptaprakhariitr/crypto-prices-mcp) |
-| **Healthcare** | [drug-interaction](https://github.com/guptaprakhariitr/drug-interaction-mcp) |
-| **Logistics** | [multi-carrier-tracking](https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp) |
+| `POST /mcp` | MCP JSON-RPC 2.0 tool surface (the main API). Bearer auth required for paid tiers. |
+| `GET /health` | Liveness probe — `{ok: true, ts}`. Used by mcp-hub cron. |
+| `GET /` | HTML landing page (OG + favicon + JSON-LD). |
+| `GET /upgrade?tier=solo|team|pro&email=...` | 302 → live Dodo Payments hosted checkout. |
+| `GET /welcome?key=...` | Post-checkout landing showing the freshly-minted API key. |
+| `GET /account` | Bearer-auth. Returns `{apiKey, tier, owner, status, portal_url}`. |
+| `POST /account/rotate` | Bearer-auth. Mints a fresh key + retires the old one. |
+| `GET /account/export` | Bearer-auth. GDPR data export — JSON of account, usage counters, Dodo details. |
+| `GET /account/team` | Bearer-auth (Team+). List team-member sub-keys. |
+| `POST /account/team/invite` | Bearer-auth (Team+). Issue a new team-member sub-key. |
+| `POST /account/team/revoke` | Bearer-auth (Team+). Revoke a team-member sub-key. |
+| `GET /team/accept?key=...` | Team-member onboarding landing for the sub-key URL. |
+| `POST /webhooks/dodo` | Standard-Webhooks signed. Dodo subscription + payment lifecycle. |
+| `GET /favicon.ico` | Inline SVG. |
 
-Full catalog: https://github.com/guptaprakhariitr · ⭐ = empty-quadrant / highest-conviction pick.
 
+## Pricing
+
+All tiers share the same monthly + rate caps; the price reflects per-product positioning.
+
+
+| Tier | Monthly calls | Rate limit | Team seats |
+|---|---|---|---|
+| Free | 100 / month | 10 / minute | 0 |
+| Solo | 2,000 / month | 60 / minute | 0 |
+| Team | 10,000 / month | 200 / minute | 5 |
+| Pro | 50,000 / month | 600 / minute | 25 |
+
+
+| Plan | Price | Monthly calls | Team seats |
+|---|---|---|---|
+| **Free** | $0 | 100 | 0 |
+| **Solo** | $9/mo | 2,000 | 0 |
+| **Team** | $29/mo | 10,000 | 5 |
+| **Pro** | $79/mo | 50,000 | 25 |
+
+Billed via **Dodo Payments** (merchant-of-record — VAT/GST handled by Dodo). Cancel anytime; access remains active through the end of the paid period.
+
+## Data sources
+
+- **USPS / UPS / FedEx / DHL / India Post / Delhivery / BlueDart / Aramex** — various — *Each carrier's public tracking endpoint*
+
+This server is a thin transport + auth + caching layer over the upstream sources. Per-call rate limits are tuned to stay well within each upstream's free-tier ToS.
+
+## Privacy + GDPR
+
+- **Privacy policy:** [https://mcp-hub.atlasword.workers.dev/privacy](https://mcp-hub.atlasword.workers.dev/privacy)
+- **Terms:** [https://mcp-hub.atlasword.workers.dev/terms](https://mcp-hub.atlasword.workers.dev/terms)
+- **Refund policy:** [https://mcp-hub.atlasword.workers.dev/refund](https://mcp-hub.atlasword.workers.dev/refund)
+- **Data export:** `GET https://multi-carrier-tracking-mcp.atlasword.workers.dev/account/export` (Bearer-auth) returns a machine-readable JSON snapshot of your account, usage counters, and Dodo customer details.
+- **Deletion:** email `prakshatechnologies@gmail.com` from the address on file.
+
+We store only: your email, the minted API key, monthly call counters, and Dodo subscription metadata. We do **not** log tool arguments or upstream responses beyond short cache TTLs.
+
+## Architecture
+
+- **Runtime:** Cloudflare Workers (V8 isolates, global edge).
+- **Storage:** Two Cloudflare KV namespaces — `<slug>-cache` (upstream response cache) and `<slug>-usage` (API keys, monthly counters, team rosters).
+- **Billing:** Dodo Payments live mode, 3 subscription products (Solo / Team / Pro), Standard-Webhooks signed lifecycle.
+- **Observability:** Cloudflare Workers Analytics; portfolio rollup at [mcp-hub status](https://mcp-hub.atlasword.workers.dev/status).
+- **Source:** TypeScript, Vitest-tested, `wrangler deploy`-able. See `src/` in this repo.
+
+## License
+
+MIT — see [LICENSE](LICENSE).
+
+## Author
+
+**Prakhar Gupta**
+- Email: `prakshatechnologies@gmail.com`
+- GitHub: [@guptaprakhariitr](https://github.com/guptaprakhariitr)
+
+## Status
+
+- **Live status page:** [https://mcp-hub.atlasword.workers.dev/status](https://mcp-hub.atlasword.workers.dev/status)
+- **Machine-readable status:** [https://mcp-hub.atlasword.workers.dev/status.json](https://mcp-hub.atlasword.workers.dev/status.json)
+- **Source repo:** [https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp](https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp)
