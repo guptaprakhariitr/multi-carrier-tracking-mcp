@@ -1,0 +1,37 @@
+name = "multi-carrier-tracking-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+[observability]
+enabled = true
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "c41bdfba7d6241cc8a0b3bd1546fcb27"
+
+[[kv_namespaces]]
+binding = "USAGE"
+id = "80bd5c2a5510491f8f2753fe50cf5676"
+
+[vars]
+UPGRADE_URL = "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/upgrade"
+PRODUCT_NAME = "multi-carrier-tracking-mcp"
+DODO_PRODUCT_ID_SOLO = "pdt_0NgkUVMkaqnP047UejPx7"
+DODO_PRODUCT_ID_TEAM = "pdt_0NgkUVOK3tWjrI0ijPXoz"
+DODO_PRODUCT_ID_PRO  = "pdt_0NgkUVQbJYPdl4IbUvhsd"
+FROM_EMAIL = "prakshatechnologies@gmail.com"
+DODO_BASE = "https://live.dodopayments.com"
+CUSTOMER_PORTAL_RETURN_URL = "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/account"
+
+# Secrets via `wrangler secret put`:
+#   USPS_USER_ID            (free USPS Web Tools key)
+#   UPS_CLIENT_ID           (free UPS dev tier)
+#   UPS_CLIENT_SECRET
+#   FEDEX_CLIENT_ID
+#   FEDEX_CLIENT_SECRET
+#   DHL_API_KEY
+#   DODO_API_KEY
+#   DODO_WEBHOOK_SECRET
+#   RESEND_API_KEY          (optional)
+#   ADMIN_TOKEN
