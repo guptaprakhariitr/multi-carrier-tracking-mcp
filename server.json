@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+  "name": "io.github.guptaprakhariitr/multi-carrier-tracking-mcp",
+  "description": "Auto-detects USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex from a tracking number.",
+  "status": "active",
+  "repository": {
+    "url": "https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp",
+    "source": "github"
+  },
+  "version_detail": {
+    "version": "0.3.0",
+    "release_date": "2026-06-10T00:00:00Z",
+    "is_latest": true
+  },
+  "packages": [
+    {
+      "registry_name": "remote",
+      "name": "multi-carrier-tracking-mcp",
+      "version": "0.3.0",
+      "runtime_hint": "http",
+      "remote_url": "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp",
+      "transport_type": "http"
+    }
+  ],
+  "remotes": [
+    {
+      "transport_type": "http",
+      "url": "https://multi-carrier-tracking-mcp.prakhar-cognizance.workers.dev/mcp"
+    }
+  ],
+  "categories": [
+    "logistics",
+    "ecommerce",
+    "utility"
+  ],
+  "tags": [
+    "tracking",
+    "usps",
+    "ups",
+    "fedex",
+    "dhl",
+    "india-post",
+    "delhivery",
+    "shipping"
+  ]
+}
