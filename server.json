@@ -14,12 +14,12 @@
   },
   "packages": [
     {
-      "registry_name": "remote",
-      "name": "multi-carrier-tracking-mcp",
-      "version": "0.3.0",
-      "runtime_hint": "http",
-      "remote_url": "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp",
-      "transport_type": "http"
+      "registryType": "npm",
+      "identifier": "@insnapsprakhar/multi-carrier-tracking-mcp",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
     }
   ],
   "remotes": [
@@ -42,5 +42,6 @@
     "india-post",
     "delhivery",
     "shipping"
-  ]
+  ],
+  "version": "0.0.2"
 }
