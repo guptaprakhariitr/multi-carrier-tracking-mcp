@@ -205,10 +205,10 @@ MIT — see [LICENSE](LICENSE).
 
 ## Install via npm (one-liner)
 
-A thin launcher is published as [`@atlasword/multi-carrier-tracking-mcp`](https://www.npmjs.com/package/@atlasword/multi-carrier-tracking-mcp) on npm. No manual URL to copy/paste:
+A thin launcher is published as [`@insnapsprakhar/multi-carrier-tracking-mcp`](https://www.npmjs.com/package/@insnapsprakhar/multi-carrier-tracking-mcp) on npm. No manual URL to copy/paste:
 
 ```bash
-npx -y @atlasword/multi-carrier-tracking-mcp
+npx -y @insnapsprakhar/multi-carrier-tracking-mcp
 ```
 
 Or wire it into your MCP client:
@@ -218,7 +218,7 @@ Or wire it into your MCP client:
   "mcpServers": {
     "multi-carrier-tracking": {
       "command": "npx",
-      "args": ["-y", "@atlasword/multi-carrier-tracking-mcp"]
+      "args": ["-y", "@insnapsprakhar/multi-carrier-tracking-mcp"]
     }
   }
 }
