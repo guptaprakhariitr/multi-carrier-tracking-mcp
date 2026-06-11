@@ -1,0 +1,69 @@
+# Smithery registry config — https://smithery.ai/docs/build/project-config/smithery-yaml
+# This is an HTTP-transport MCP server; Smithery hosts the listing and proxies
+# clients straight to our Cloudflare Workers endpoint.
+
+name: multi-carrier-tracking-mcp
+displayName: Package Tracking (8 carriers)
+description: |
+  Auto-detects USPS, UPS, FedEx, DHL, India Post, Delhivery, BlueDart, Aramex from a tracking number. Returns structured events and current status.
+homepage: https://multi-carrier-tracking-mcp.atlasword.workers.dev
+repository: https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp
+license: MIT
+version: "0.3.0"
+
+runtime: container
+
+startCommand:
+  type: http
+  url: https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp
+  configSchema:
+    type: object
+    properties:
+      apiKey:
+        type: string
+        title: API key (optional)
+        description: |
+          Bearer token from https://multi-carrier-tracking-mcp.atlasword.workers.dev/upgrade.
+          Leave blank for the anonymous free tier (~100 calls/month/IP).
+    required: []
+  exampleConfig:
+    apiKey: ""
+  commandFunction: |-
+    (config) => ({
+      type: "http",
+      url: "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp",
+      headers: config.apiKey ? { Authorization: `Bearer ${config.apiKey}` } : {}
+    })
+
+remote:
+  type: http
+  url: https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp
+
+categories:
+  - logistics
+  - ecommerce
+  - utility
+tags:
+  - tracking
+  - usps
+  - ups
+  - fedex
+  - dhl
+  - india-post
+  - delhivery
+  - shipping
+
+tools:
+  - name: track_package
+  - name: track_multiple
+  - name: detect_carrier
+  - name: list_carriers
+  - name: subscribe_tracking
+
+auth:
+  type: bearer
+  required: false
+  description: |
+    Optional. Anonymous free tier works for ~100 calls/month per IP. For higher
+    quotas, grab a key from https://multi-carrier-tracking-mcp.atlasword.workers.dev/upgrade and pass
+    it as `Authorization: Bearer <key>`.
