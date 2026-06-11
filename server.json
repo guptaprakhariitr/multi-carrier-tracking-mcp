@@ -3,7 +3,7 @@
   "name": "io.github.guptaprakhariitr/multi-carrier-tracking-mcp",
   "title": "Multi-Carrier Tracking",
   "description": "Auto-detect carrier from tracking number: USPS, UPS, FedEx, DHL, India Post, more.",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "websiteUrl": "https://multi-carrier-tracking-mcp.atlasword.workers.dev/",
   "repository": {
     "url": "https://github.com/guptaprakhariitr/multi-carrier-tracking-mcp",
@@ -13,16 +13,6 @@
     {
       "type": "streamable-http",
       "url": "https://multi-carrier-tracking-mcp.atlasword.workers.dev/mcp"
-    }
-  ],
-  "packages": [
-    {
-      "registryType": "npm",
-      "identifier": "@insnapsprakhar/multi-carrier-tracking-mcp",
-      "version": "0.3.0",
-      "transport": {
-        "type": "stdio"
-      }
     }
   ]
 }
